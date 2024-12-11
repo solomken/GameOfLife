@@ -54,11 +54,7 @@ func neighboursCount(i int, j int, universe [][]string) int {
 }
 
 func isNeighbourAlive(i, j int, universe [][]string) bool {
-	if universe[i][j] == " " {
-		return false
-	}
-
-	return true
+	return universe[i][j] != " "
 }
 
 func northWestNeighbour(i, j, universeSize int) (int, int) {
@@ -157,13 +153,15 @@ func southEastNeighbour(i, j, universeSize int) (int, int) {
 	return i, j
 }
 
-func initUniverse(universeSize int) [][]string {
+func initUniverse(universeSize int, seed int64) [][]string {
+	r := rand.New(rand.NewSource(seed))
+
 	universe := make([][]string, universeSize)
 
 	for i := 0; i < universeSize; i++ {
 		universe[i] = make([]string, universeSize)
 		for j := 0; j < universeSize; j++ {
-			if rand.Intn(2) == 1 {
+			if r.Intn(2) == 1 {
 				universe[i][j] = "O"
 				continue
 			}
@@ -197,9 +195,8 @@ func emptyUniverse(universeSize int) [][]string {
 	return universe
 }
 
-func buildGeneration(universe [][]string) [][]string {
+func buildGenerations(universe [][]string) [][]string {
 	var universeSize = len(universe)
-
 	nextGeneration := emptyUniverse(universeSize)
 
 	//check current cell
@@ -225,40 +222,21 @@ func buildGeneration(universe [][]string) [][]string {
 	return nextGeneration
 }
 
-func countAlive(universe [][]string) int {
-	var universeSize = len(universe)
-	var aliveCount int
-
-	for i := 0; i < universeSize; i++ {
-		for j := 0; j < universeSize; j++ {
-			if universe[i][j] == "O" {
-				aliveCount++
-			}
-		}
-	}
-	return aliveCount
-}
-
-func printGenerationInfo(generationNumber int, aliveNumber int) {
-	fmt.Printf("Generation #%d\nAlive: %d\n", generationNumber, aliveNumber)
-}
-
 func main() {
 	var universeSize int
-	var generationsCount = 11
-	_, err := fmt.Scan(&universeSize)
+	var seed int64
+	var generationsCount int
+	_, err := fmt.Scan(&universeSize, &seed, &generationsCount)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if universeSize <= 0 {
-		log.Fatal("universeSize must be greater than zero")
+	if universeSize <= 0 || seed < 0 {
+		log.Fatal("universeSize and seed must be greater than zero")
 	}
 
-	universe := initUniverse(universeSize)
+	universe := initUniverse(universeSize, seed)
 	for i := 0; i < generationsCount; i++ {
-		universe = buildGeneration(universe)
-		alive := countAlive(universe)
-		printGenerationInfo(i+1, alive)
-		printUniverse(universe)
+		universe = buildGenerations(universe)
 	}
+	printUniverse(universe)
 }
