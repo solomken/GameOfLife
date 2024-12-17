@@ -6,10 +6,16 @@ import (
 )
 
 func Test_initUniverse(t *testing.T) {
-	got := initUniverse(4, 4)
-	want := [][]string{{"O", " ", "O", "O"}, {"O", "O", " ", "O"}, {"O", " ", "O", " "}, {"O", "O", " ", " "}}
+	tests := map[string]struct {
+		want [][]string
+	}{
+		"empty universe": {want: [][]string{{"O", " ", "O", "O"}, {"O", "O", " ", "O"}, {"O", " ", "O", " "}, {"O", "O", " ", " "}}},
+	}
 
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("got %q want %q", got, want)
+	for name, tc := range tests {
+		got := initUniverse(4, 4)
+		if !reflect.DeepEqual(tc.want, got) {
+			t.Errorf("%s: got: %v, want: %v", name, got, tc.want)
+		}
 	}
 }
